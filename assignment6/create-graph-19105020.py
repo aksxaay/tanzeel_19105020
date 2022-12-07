@@ -1,49 +1,97 @@
-from collections import defaultdict
-graph = defaultdict(list)
-def addEdge(graph,u,v):
-    graph[u].append(v)
+class Node:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
-def generate_edges(graph):
-    edges = []
-    for node in graph:
-        for neighbour in graph[node]:
-            edges.append((node, neighbour))
-    return edges
 
-def dfs(visited, graph, node): 
-    if node not in visited:
-        print (node, end=" ")
-        visited.add(node)
-        for neighbour in graph[node]:
-            dfs(visited, graph, neighbour)
+class Graph:
+    # Constructor initializes an empty dictionary
+    def __init__(self):
+        self.al = {}
 
-visited2 = set() # List for visited nodes
-queue = []       # Initialize a queue
 
-def bfs(visited2, graph, node): # function for BFS
-  visited2.add(node)
-  queue.append(node)
-  while queue:                  # Creating loop to visit each node
-    m = queue.pop(0) 
-    print (m, end = " ") 
-    for neighbour in graph[m]:
-      if neighbour not in visited2:
-        visited2.add(neighbour)
-        queue.append(neighbour)
+    """ This method adds a node to the graph in the form of an (key, value) pair. The key being the node itself
+        and the value is the list of nodes that can be accessed from that node. This is called an adjacency list.
+    """
 
-addEdge(graph,'a','c')
-addEdge(graph,'b','c')
-addEdge(graph,'b','e')
-addEdge(graph,'c','d')
-addEdge(graph,'c','f')
-addEdge(graph,'c','g')
-addEdge(graph,'c','b')
-addEdge(graph,'e','b')
-addEdge(graph,'d','c')
-addEdge(graph,'e','c')
+    def addNode(self, node, lst):
+        self.al[node] = lst
 
-visited = set() # Set to keep track of visited nodes of graph.
-print("Following is the Depth-First Search")
-dfs(visited, graph, 'a')
-print("\nFollowing is the Breadth-First Search")
-bfs(visited2, graph, 'a')
+    """ Code for traversing the graph in Breadth First Search manner. This is level-wise searching.
+        This gives us shortest path from one node to another. """
+
+    def bfs(self, node):
+        print (node.name)
+        level = {node: 0}
+        """
+        level is a dictionary which holds all the visited nodes and their levels.
+        This dictionary is looked up every time we want to see if a node has been visited.
+        """
+
+        parent = {node: None}
+
+        i = 1  # i is for keeping track of the levels
+
+        frontier = [node]
+        """
+        This will be assigned as a new list in every iteration.
+        This will have the list of nodes adjacent to the current node till no node is left un-visited.
+        """
+
+        while frontier:
+            next_node = []
+            """
+            next_node is a temporary list to hold the values that would become the next frontiers
+            """
+
+            for u in frontier:
+                for v in self.al[u]:
+                    if v not in level:
+                        print (v.name)
+                        level[v] = i
+                        parent[v] = u
+                        next_node.append(v)
+
+            frontier = next_node
+            i += 1
+        return level
+
+    def dfs_visit(self, x, visited):
+        if x in visited.keys():
+            return
+        else:
+            print (x.name)
+            visited[x] = True
+            for w in self.al[x]:
+                self.dfs_visit(w, visited)
+
+    def depth_first(self, node):
+        print (node.name)
+        visited = {node: True}
+
+        for w in self.al[node]:
+            self.dfs_visit(w, visited)
+
+
+def main():
+    a = Node('a', 5)
+    b = Node('b', 3)
+    c = Node('c', 6)
+    d = Node('d', 7)
+    e = Node('e', 9)
+
+    g = Graph()
+    g.addNode(a, [b, d])
+    g.addNode(b, [a, c, d])
+    g.addNode(c, [b, d, e])
+    g.addNode(d, [a, b, c, e])
+    g.addNode(e, [d, c])
+
+    print("BFS :")
+    g.bfs(a)
+    print("DFS :")
+    g.depth_first(a)
+
+
+if __name__ == '__main__':
+    main()
